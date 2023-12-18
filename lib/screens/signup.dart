@@ -263,8 +263,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
         await _firebaseService.userSignUp(
             _emailController.text, _passwordController.text, context);
 
-        // Navigate to the home screen on successful sign-up
-        Navigator.pushReplacementNamed(context, '/homeScreen');
+        // Check authentication status before navigating
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+          if (user != null && !user.emailVerified) {
+            // User is authenticated but not verified, send verification email
+            user.sendEmailVerification();
+            AppSnackBar().showSnackBar(
+                context, 'Verification email sent. Please check your inbox.');
+
+            // Optionally, you can wait for the user to confirm before navigating
+            // For simplicity, this example navigates immediately
+            Navigator.pushReplacementNamed(context, '/homeScreen');
+          } else if (user != null && user.emailVerified) {
+            // User is authenticated and verified, navigate to the home screen
+            Navigator.pushReplacementNamed(context, '/homeScreen');
+          } else {
+            // User is not authenticated, handle accordingly
+            AppSnackBar().showSnackBar(context, 'Sign-up failed.');
+          }
+        });
       }
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase authentication exceptions

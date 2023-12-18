@@ -56,4 +56,15 @@ class FirebaseService {
         return 'Authentication failed: ${e.message}';
     }
   }
+
+  // sign out user
+  Future<void> userSignOut(BuildContext context) async {
+    try {
+      await _firebaseAuth.signOut();
+    } on FirebaseAuthException catch (e) {
+      AppSnackBar().showSnackBar(context, e.message.toString());
+    } catch (e) {
+      AppSnackBar().showSnackBar(context, e.toString());
+    }
+  }
 }

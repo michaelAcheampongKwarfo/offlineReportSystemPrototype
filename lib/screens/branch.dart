@@ -9,9 +9,11 @@ class BranchScreen extends StatelessWidget {
   final String branchName;
   final String branchImage;
 
-  const BranchScreen(
-      {Key? key, required this.branchName, required this.branchImage})
-      : super(key: key);
+  const BranchScreen({
+    super.key,
+    required this.branchName,
+    required this.branchImage,
+  });
 
   @override
   Widget build(BuildContext context) {

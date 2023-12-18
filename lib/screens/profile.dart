@@ -1,11 +1,22 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:offline_report_system/services/firebase_services.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
+import 'package:offline_report_system/widgets/app_snackbar.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final FirebaseService _firebaseService = FirebaseService();
 
   @override
   Widget build(BuildContext context) {
@@ -227,5 +238,14 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void userSignOut() async {
+    try {
+      await _firebaseService.userSignOut(context);
+      Navigator.pushReplacementNamed(context, '/welcomeScreen');
+    } catch (e) {
+      AppSnackBar().showSnackBar(context, 'An error occurred: $e');
+    }
   }
 }

@@ -254,8 +254,16 @@ class _SignInScreenState extends State<SignInScreen> {
           context,
         );
 
-        // Navigate to the home screen on successful sign-in
-        Navigator.pushReplacementNamed(context, '/homeScreen');
+        // Check authentication status before navigating
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+          if (user != null) {
+            // User is authenticated, navigate to the home screen
+            Navigator.pushReplacementNamed(context, '/homeScreen');
+          } else {
+            // User is not authenticated, handle accordingly
+            AppSnackBar().showSnackBar(context, 'Authentication failed.');
+          }
+        });
       }
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase authentication exceptions
