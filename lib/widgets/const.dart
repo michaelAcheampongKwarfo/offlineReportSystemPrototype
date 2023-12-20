@@ -38,3 +38,12 @@ List provinceList = [
   'Northern Province',
   'North West Province'
 ];
+
+Map contactMap = {
+  'Call Us(Toll Free)': '100',
+  'Call from any phone': '0244 300 300',
+  'Whatsapp': '0554 300 300',
+  'Email Us': 'offlineReportSystem@gmail.com',
+  'Facebook': '@offlineReportSystemSLCB',
+  'Twitter': '@offlineReportSystemSLCB'
+};

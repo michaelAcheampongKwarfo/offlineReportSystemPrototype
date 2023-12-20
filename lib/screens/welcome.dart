@@ -62,7 +62,6 @@ class WelcomeScreen extends StatelessWidget {
                       text: 'Sierra Leone Commercial Bank',
                       color: AppColors.primaryColor,
                       fontSize: 19.0,
-                      fontWeight: FontWeight.bold,
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(
@@ -70,15 +69,10 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     const AppText(
                       text: 'Offline Report System',
-                      fontSize: 19.0,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      //fontWeight: FontWeight.bold,
                       textAlign: TextAlign.center,
                     ),
-                    // const AppText(
-                    //   text: 'Delivering Value',
-                    //   color: AppColors.hintColor,
-                    //   fontWeight: FontWeight.bold,
-                    // ),
                     SizedBox(
                       height: screenSize.height * 0.03,
                     ),
@@ -107,54 +101,54 @@ class WelcomeScreen extends StatelessWidget {
                     SizedBox(
                       height: screenSize.height * 0.02,
                     ),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AppText(
-                          text: '----- Or connect using -----',
-                          color: AppColors.hintColor,
-                          fontSize: 15.0,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: screenSize.height * 0.02,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AppButton(
-                            onTap: () {},
-                            width: screenSize.width * 0.2,
-                            buttonColor: AppColors.blueColor,
-                            child: const Icon(
-                              Icons.facebook,
-                              color: AppColors.whiteColor,
-                            )),
-                        SizedBox(
-                          width: screenSize.width * 0.03,
-                        ),
-                        AppButton(
-                            onTap: () {},
-                            width: screenSize.width * 0.2,
-                            buttonColor: AppColors.redColor,
-                            child: const Icon(
-                              Icons.email,
-                              color: AppColors.whiteColor,
-                            )),
-                        SizedBox(
-                          width: screenSize.width * 0.03,
-                        ),
-                        AppButton(
-                            onTap: () {},
-                            width: screenSize.width * 0.2,
-                            buttonColor: AppColors.hintColor,
-                            child: const Icon(
-                              Icons.phone_android,
-                              color: AppColors.whiteColor,
-                            )),
-                      ],
-                    )
+                    // const Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     AppText(
+                    //       text: '----- Or connect using -----',
+                    //       color: AppColors.hintColor,
+                    //       fontSize: 15.0,
+                    //     ),
+                    //   ],
+                    // ),
+                    // SizedBox(
+                    //   height: screenSize.height * 0.02,
+                    // ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     AppButton(
+                    //         onTap: () {},
+                    //         width: screenSize.width * 0.2,
+                    //         buttonColor: AppColors.blueColor,
+                    //         child: const Icon(
+                    //           Icons.facebook,
+                    //           color: AppColors.whiteColor,
+                    //         )),
+                    //     SizedBox(
+                    //       width: screenSize.width * 0.03,
+                    //     ),
+                    //     AppButton(
+                    //         onTap: () {},
+                    //         width: screenSize.width * 0.2,
+                    //         buttonColor: AppColors.redColor,
+                    //         child: const Icon(
+                    //           Icons.email,
+                    //           color: AppColors.whiteColor,
+                    //         )),
+                    //     SizedBox(
+                    //       width: screenSize.width * 0.03,
+                    //     ),
+                    //     AppButton(
+                    //         onTap: () {},
+                    //         width: screenSize.width * 0.2,
+                    //         buttonColor: AppColors.hintColor,
+                    //         child: const Icon(
+                    //           Icons.phone_android,
+                    //           color: AppColors.whiteColor,
+                    //         )),
+                    //   ],
+                    // )
                   ],
                 ),
               )

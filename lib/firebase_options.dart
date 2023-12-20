@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,20 +43,38 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyA2Cn5CC6K9ODg3jkiSmEW5dkMEkvBclrM',
+    appId: '1:218965503165:web:54523a1cc9556c173e1bd4',
+    messagingSenderId: '218965503165',
+    projectId: 'offlinereportsystem-d6353',
+    authDomain: 'offlinereportsystem-d6353.firebaseapp.com',
+    storageBucket: 'offlinereportsystem-d6353.appspot.com',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBfqZs4T9kSjZ8XR08dVLnFdPfHnetOplQ',
-    appId: '1:105856370860:android:a947a49e1dd5adc3f47709',
-    messagingSenderId: '105856370860',
-    projectId: 'prototype-3ad8f',
-    storageBucket: 'prototype-3ad8f.appspot.com',
+    apiKey: 'AIzaSyBlYDIM3tSKii3R27sJnCp1JmBvlG4oMiU',
+    appId: '1:218965503165:android:d5603a1a443a05703e1bd4',
+    messagingSenderId: '218965503165',
+    projectId: 'offlinereportsystem-d6353',
+    storageBucket: 'offlinereportsystem-d6353.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBTyoC-IjHzzz-21kNU9aHRkQjjsBvqaDo',
-    appId: '1:105856370860:ios:389f1a516fdf70adf47709',
-    messagingSenderId: '105856370860',
-    projectId: 'prototype-3ad8f',
-    storageBucket: 'prototype-3ad8f.appspot.com',
+    apiKey: 'AIzaSyBxv1yCaqTkFcOD9myWzRli-DNmF5SDz00',
+    appId: '1:218965503165:ios:fadcfbc4498963983e1bd4',
+    messagingSenderId: '218965503165',
+    projectId: 'offlinereportsystem-d6353',
+    storageBucket: 'offlinereportsystem-d6353.appspot.com',
     iosBundleId: 'com.example.offlineReportSystem',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBxv1yCaqTkFcOD9myWzRli-DNmF5SDz00',
+    appId: '1:218965503165:ios:b1042782fb4152d03e1bd4',
+    messagingSenderId: '218965503165',
+    projectId: 'offlinereportsystem-d6353',
+    storageBucket: 'offlinereportsystem-d6353.appspot.com',
+    iosBundleId: 'com.example.offlineReportSystem.RunnerTests',
   );
 }

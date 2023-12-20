@@ -14,11 +14,24 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const AppText(text: 'Offline Report'),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/profileScreen');
-            },
-            icon: const Icon(Icons.menu)),
+        leading: Container(),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: screenSize.width * 0.08),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.hintColor, width: 0.8),
+                  borderRadius: BorderRadius.circular(12.0)),
+              child: IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/profileScreen');
+                  },
+                  icon: const Icon(
+                    Icons.menu,
+                  )),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -33,7 +33,7 @@ class AppTextField extends StatelessWidget {
         obscureText: isObscure,
         keyboardType: textInputType,
         style: const TextStyle(
-          fontSize: 18.0,
+          fontSize: 16.0,
           fontWeight: FontWeight.w500,
           fontFamily: 'Times New Roman',
         ),
@@ -44,7 +44,7 @@ class AppTextField extends StatelessWidget {
           ),
           hintText: hintText,
           hintStyle: const TextStyle(
-            fontSize: 18.0,
+            fontSize: 16.0,
             fontWeight: FontWeight.w500,
             fontFamily: 'Times New Roman',
           ),

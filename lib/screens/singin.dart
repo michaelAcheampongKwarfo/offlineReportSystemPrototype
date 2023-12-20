@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:offline_report_system/services/firebase_services.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
@@ -19,7 +18,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseServices _firebaseServices = FirebaseServices();
   bool _isLoading = false;
 
   @override
@@ -149,7 +148,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 : AppButton(
                                     onTap: () {
                                       // sign in user and navigate to home screen
-                                      userSignIn();
+                                      userSignInMethod();
                                     },
                                     child: const AppText(
                                       text: 'Sign In',
@@ -175,58 +174,58 @@ class _SignInScreenState extends State<SignInScreen> {
                       SizedBox(
                         height: screenSize.height * 0.02,
                       ),
-                      const Align(
-                        alignment: Alignment.center,
-                        child: AppText(
-                          text: '----- Or connect using -----',
-                          color: AppColors.hintColor,
-                        ),
-                      ),
+                      // const Align(
+                      //   alignment: Alignment.center,
+                      //   child: AppText(
+                      //     text: '----- Or connect using -----',
+                      //     color: AppColors.hintColor,
+                      //   ),
+                      // ),
                       SizedBox(
                         height: screenSize.height * 0.02,
                       ),
-                      Container(
-                          width: screenSize.width,
-                          padding: EdgeInsets.all(screenSize.width * 0.03),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.0),
-                            color: AppColors.whiteColor,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AppButton(
-                                  onTap: () {},
-                                  width: screenSize.width * 0.2,
-                                  buttonColor: AppColors.blueColor,
-                                  child: const Icon(
-                                    Icons.facebook,
-                                    color: AppColors.whiteColor,
-                                  )),
-                              SizedBox(
-                                width: screenSize.width * 0.03,
-                              ),
-                              AppButton(
-                                  onTap: () {},
-                                  width: screenSize.width * 0.2,
-                                  buttonColor: AppColors.redColor,
-                                  child: const Icon(
-                                    Icons.email,
-                                    color: AppColors.whiteColor,
-                                  )),
-                              SizedBox(
-                                width: screenSize.width * 0.03,
-                              ),
-                              AppButton(
-                                  onTap: () {},
-                                  width: screenSize.width * 0.2,
-                                  buttonColor: AppColors.hintColor,
-                                  child: const Icon(
-                                    Icons.phone_android,
-                                    color: AppColors.whiteColor,
-                                  )),
-                            ],
-                          ))
+                      // Container(
+                      //     width: screenSize.width,
+                      //     padding: EdgeInsets.all(screenSize.width * 0.03),
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(12.0),
+                      //       color: AppColors.whiteColor,
+                      //     ),
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         AppButton(
+                      //             onTap: () {},
+                      //             width: screenSize.width * 0.2,
+                      //             buttonColor: AppColors.blueColor,
+                      //             child: const Icon(
+                      //               Icons.facebook,
+                      //               color: AppColors.whiteColor,
+                      //             )),
+                      //         SizedBox(
+                      //           width: screenSize.width * 0.03,
+                      //         ),
+                      //         AppButton(
+                      //             onTap: () {},
+                      //             width: screenSize.width * 0.2,
+                      //             buttonColor: AppColors.redColor,
+                      //             child: const Icon(
+                      //               Icons.email,
+                      //               color: AppColors.whiteColor,
+                      //             )),
+                      //         SizedBox(
+                      //           width: screenSize.width * 0.03,
+                      //         ),
+                      //         AppButton(
+                      //             onTap: () {},
+                      //             width: screenSize.width * 0.2,
+                      //             buttonColor: AppColors.hintColor,
+                      //             child: const Icon(
+                      //               Icons.phone_android,
+                      //               color: AppColors.whiteColor,
+                      //             )),
+                      //       ],
+                      //     ))
                     ],
                   ),
                 ),
@@ -238,50 +237,34 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  void userSignIn() async {
+  void userSignInMethod() async {
     try {
       if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-        AppSnackBar().showSnackBar(context, 'All fields are required!');
+        AppSnackBar().showSnackBar(context, 'All fields are required');
       } else {
         setState(() {
           _isLoading = true;
         });
-
-        // Attempt to sign in the user
-        await _firebaseService.userSignIn(
-          _emailController.text,
-          _passwordController.text,
+        await _firebaseServices.userSignInMethod(
           context,
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
         );
-
-        // Check authentication status before navigating
-        FirebaseAuth.instance.authStateChanges().listen((User? user) {
-          if (user != null) {
-            // User is authenticated, navigate to the home screen
-            Navigator.pushReplacementNamed(context, '/homeScreen');
-          } else {
-            // User is not authenticated, handle accordingly
-            AppSnackBar().showSnackBar(context, 'Authentication failed.');
-          }
-        });
-      }
-    } on FirebaseAuthException catch (e) {
-      // Handle specific Firebase authentication exceptions
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        AppSnackBar().showSnackBar(context, 'Invalid email or password');
-      } else {
-        AppSnackBar()
-            .showSnackBar(context, 'Authentication failed: ${e.message}');
+        if (_firebaseServices.user.emailVerified) {
+          Navigator.pushReplacementNamed(context, '/homeScreen');
+        } else {
+          AppSnackBar().showSnackBar(
+            context,
+            'Please go to ${_firebaseServices.user.email!} and verify your email. Check your spam folder if needed.',
+          );
+        }
       }
     } catch (e) {
-      // Handle other exceptions
-      AppSnackBar().showSnackBar(context, 'An error occurred: $e');
+      // AppSnackBar().showSnackBar(context, 'Error Signing In : $e');
     } finally {
       setState(() {
         _isLoading = false;
       });
-
-      // Clear text controllers
       _emailController.clear();
       _passwordController.clear();
     }

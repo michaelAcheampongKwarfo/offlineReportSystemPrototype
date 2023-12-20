@@ -2,10 +2,10 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:offline_report_system/screens/utils_screen.dart';
 import 'package:offline_report_system/services/firebase_services.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
-import 'package:offline_report_system/widgets/app_snackbar.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,8 +16,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final FirebaseService _firebaseService = FirebaseService();
-
+  bool _isLoading = false;
+  final FirebaseServices _firebaseServices = FirebaseServices();
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -120,7 +120,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Column(
                           children: [
                             AppButton(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/contactUsScreen');
+                              },
                               width: screenSize.width * 0.2,
                               borderColor: AppColors.primaryColor,
                               buttonColor: AppColors.whiteColor,
@@ -138,7 +141,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Column(
                           children: [
                             AppButton(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UtilsScreen(
+                                      title: 'SLCB - Help and Support',
+                                      heading: 'Report Issue',
+                                    ),
+                                  ),
+                                );
+                              },
                               width: screenSize.width * 0.2,
                               borderColor: AppColors.primaryColor,
                               buttonColor: AppColors.whiteColor,
@@ -167,7 +180,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Column(
                           children: [
                             AppButton(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UtilsScreen(
+                                      title: 'SLCB - Legal',
+                                      heading: 'Legal Policy',
+                                    ),
+                                  ),
+                                );
+                              },
                               width: screenSize.width * 0.2,
                               borderColor: AppColors.primaryColor,
                               buttonColor: AppColors.whiteColor,
@@ -187,7 +210,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Column(
                           children: [
                             AppButton(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UtilsScreen(
+                                      title: 'SLCB - Legal',
+                                      heading: 'Community Standard',
+                                    ),
+                                  ),
+                                );
+                              },
                               width: screenSize.width * 0.2,
                               borderColor: AppColors.primaryColor,
                               buttonColor: AppColors.whiteColor,
@@ -209,24 +242,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           const AppText(text: 'APP VERSION 1.0.0'),
-                          AppButton(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/welcomeScreen');
-                            },
-                            width: screenSize.width * 0.5,
-                            borderColor: AppColors.primaryColor,
-                            buttonColor: AppColors.whiteColor,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const AppText(text: 'LOGOUT'),
-                                SizedBox(
-                                  width: screenSize.width * 0.03,
-                                ),
-                                const Icon(Icons.logout_outlined),
-                              ],
-                            ),
-                          )
+                          _isLoading
+                              ? const CircularProgressIndicator()
+                              : AppButton(
+                                  onTap: () {
+                                    userSignOut();
+                                  },
+                                  width: screenSize.width * 0.5,
+                                  borderColor: AppColors.primaryColor,
+                                  buttonColor: AppColors.whiteColor,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const AppText(text: 'LOGOUT'),
+                                      SizedBox(
+                                        width: screenSize.width * 0.03,
+                                      ),
+                                      const Icon(Icons.logout_outlined),
+                                    ],
+                                  ),
+                                )
                         ],
                       ),
                     )
@@ -242,10 +277,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void userSignOut() async {
     try {
-      await _firebaseService.userSignOut(context);
+      setState(() {
+        _isLoading = true;
+      });
+      await _firebaseServices.userSignOutMethod(context);
       Navigator.pushReplacementNamed(context, '/welcomeScreen');
     } catch (e) {
-      AppSnackBar().showSnackBar(context, 'An error occurred: $e');
+      //AppSnackBar().showSnackBar(context, e.toString());
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }
