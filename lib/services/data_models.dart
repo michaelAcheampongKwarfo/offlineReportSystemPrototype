@@ -2,7 +2,8 @@ class FileChange {
   int id;
   String filename;
   String path;
-  String timestamp;
+  String date;
+  String time;
   String type;
   String branch;
   String app;
@@ -11,7 +12,8 @@ class FileChange {
     required this.id,
     required this.filename,
     required this.path,
-    required this.timestamp,
+    required this.date,
+    required this.time,
     required this.type,
     required this.branch,
     required this.app,
@@ -22,7 +24,8 @@ class FileChange {
       id: json['id'],
       filename: json['filename'],
       path: json['path'],
-      timestamp: json['timestamp'],
+      date: json['date'],
+      time: json['time'],
       type: json['type'],
       branch: json['branch'],
       app: json['app'],

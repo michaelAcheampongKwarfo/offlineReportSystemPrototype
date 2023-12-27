@@ -48,15 +48,15 @@ class _BranchDataTableState extends State<BranchDataTable> {
     return Scaffold(
       appBar: AppBar(
         title: AppText(text: widget.branchName),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.print,
-              color: AppColors.blackColor,
-            ),
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(
+        //       Icons.print,
+        //       color: AppColors.blackColor,
+        //     ),
+        //   )
+        // ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(screenSize.width * 0.01),
@@ -75,6 +75,7 @@ class _BranchDataTableState extends State<BranchDataTable> {
                         DataColumn(label: AppText(text: 'ID')),
                         DataColumn(label: AppText(text: 'Name')),
                         //DataColumn(label: AppText(text: 'Path')),
+                        DataColumn(label: AppText(text: 'Date')),
                         DataColumn(label: AppText(text: 'Time')),
                         DataColumn(label: AppText(text: 'Type')),
                         DataColumn(label: AppText(text: 'Branch')),
@@ -97,7 +98,8 @@ class _BranchDataTableState extends State<BranchDataTable> {
                               ),
                             )),
                             //DataCell(AppText(text: data.path)),
-                            DataCell(AppText(text: data.timestamp)),
+                            DataCell(AppText(text: data.date)),
+                            DataCell(AppText(text: data.time)),
                             DataCell(AppText(text: data.type)),
                             DataCell(AppText(text: data.branch)),
                             //DataCell(AppText(text: data.app)),
@@ -209,10 +211,19 @@ class _BranchDataTableState extends State<BranchDataTable> {
               Row(
                 children: [
                   const AppText(
+                    text: "Date: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(text: data.date),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
                     text: "Time: ",
                     fontWeight: FontWeight.bold,
                   ),
-                  AppText(text: data.timestamp),
+                  AppText(text: data.time),
                 ],
               ),
               Row(

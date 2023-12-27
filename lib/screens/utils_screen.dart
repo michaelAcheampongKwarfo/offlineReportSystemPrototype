@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
-import 'package:offline_report_system/widgets/const.dart';
 
 class UtilsScreen extends StatelessWidget {
   final String title;
   final String heading;
-  final String? subTitle;
+  final String subTitle;
   const UtilsScreen(
-      {super.key, required this.title, required this.heading, this.subTitle});
+      {super.key,
+      required this.title,
+      required this.heading,
+      required this.subTitle});
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,7 @@ class UtilsScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(screenSize.width * 0.03),
                   child: AppText(
-                    text: subTitle ??
-                        randomText + randomText + randomText + randomText,
+                    text: subTitle,
                     textAlign: TextAlign.justify,
                   ),
                 ),

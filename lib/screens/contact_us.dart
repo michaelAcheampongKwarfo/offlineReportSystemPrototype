@@ -32,13 +32,16 @@ class ContactUsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: screenSize.height * 0.15,
-                child: const Center(
-                  child: AppText(
-                    text:
-                        'Our customer care representative are available 24 hours to attend to all your service needs .',
-                    fontWeight: FontWeight.bold,
+              Padding(
+                padding: EdgeInsets.only(left: screenSize.width * 0.03),
+                child: SizedBox(
+                  height: screenSize.height * 0.15,
+                  child: const Center(
+                    child: AppText(
+                      text:
+                          'Our customer care representative are available 24 hours to attend to all your service needs .',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

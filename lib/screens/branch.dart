@@ -27,7 +27,7 @@ class BranchScreen extends StatelessWidget {
         children: [
           Container(
             width: screenSize.width,
-            height: screenSize.height * 0.45,
+            height: screenSize.height * 0.43,
             decoration: const BoxDecoration(
               color: AppColors.bgColor,
               borderRadius: BorderRadius.only(
@@ -35,7 +35,7 @@ class BranchScreen extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: screenSize.height * 0.02),
+              padding: EdgeInsets.only(top: screenSize.height * 0.02),
               child: Column(
                 children: [
                   const AppText(
@@ -48,19 +48,19 @@ class BranchScreen extends StatelessWidget {
                   ),
                   Image.asset(
                     branchImage,
-                    height: screenSize.height * 0.3,
+                    height: screenSize.height * 0.35,
                     width: screenSize.width,
                     fit: BoxFit.cover,
                   ),
-                  SizedBox(
-                    height: screenSize.height * 0.02,
-                  ),
-                  AppText(
-                    text: randomText,
-                    fontSize: 14.0,
-                    textAlign: TextAlign.center,
-                    textOverflow: TextOverflow.ellipsis,
-                  ),
+                  // SizedBox(
+                  //   height: screenSize.height * 0.02,
+                  // ),
+                  // AppText(
+                  //   text: randomText,
+                  //   fontSize: 14.0,
+                  //   textAlign: TextAlign.center,
+                  //   textOverflow: TextOverflow.ellipsis,
+                  // ),
                 ],
               ),
             ),
@@ -87,7 +87,8 @@ class BranchScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                     AppText(
-                      text: randomText,
+                      text: noteMessage,
+                      textAlign: TextAlign.justify,
                       color: AppColors.blackColor,
                     ),
                     SizedBox(

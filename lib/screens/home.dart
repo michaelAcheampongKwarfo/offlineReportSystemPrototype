@@ -4,6 +4,7 @@ import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
 import 'package:offline_report_system/widgets/const.dart';
 import 'package:offline_report_system/widgets/grid_card.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,7 @@ class HomeScreen extends StatelessWidget {
                   },
                   icon: const Icon(
                     Icons.menu,
+                    color: AppColors.bgColor,
                   )),
             ),
           ),
@@ -60,9 +62,15 @@ class HomeScreen extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(
                             vertical: screenSize.height * 0.02),
-                        child: AppText(
-                          text: 'Showing report as at ${DateTime.now()}',
-                          fontSize: 12.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AppText(
+                              text:
+                                  'Showing report as at ${DateFormat('dd-MM-yy - HH:mm').format(DateTime.now())}',
+                              fontSize: 12.0,
+                            ),
+                          ],
                         ),
                       )
                     ],

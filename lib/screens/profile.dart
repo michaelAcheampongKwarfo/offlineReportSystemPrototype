@@ -7,6 +7,7 @@ import 'package:offline_report_system/services/firebase_services.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
+import 'package:offline_report_system/widgets/const.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: const AppText(
@@ -57,8 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     AppText(
-                      text: FirebaseAuth.instance.currentUser!.email ??
-                          'User Name',
+                      text: user?.email ?? 'User Name',
                       fontWeight: FontWeight.bold,
                     ),
                   ],
@@ -93,16 +94,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Column(
                       children: [
                         AppButton(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UtilsScreen(
+                                  title: 'SLCB - Help and Support',
+                                  heading: 'Report Issue',
+                                  subTitle: appVersion,
+                                ),
+                              ),
+                            );
+                          },
                           width: screenSize.width * 0.2,
                           borderColor: AppColors.primaryColor,
                           buttonColor: AppColors.whiteColor,
-                          child: const Icon(Icons.star_outline),
+                          child: const Icon(Icons.phone_android_outlined),
                         ),
                         SizedBox(
                           height: screenSize.height * 0.01,
                         ),
-                        const AppText(text: 'Send\nFeedback'),
+                        const AppText(text: 'App\nVersion'),
                       ],
                     ),
                     SizedBox(
@@ -145,9 +157,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const UtilsScreen(
+                                    builder: (context) => UtilsScreen(
                                       title: 'SLCB - Help and Support',
                                       heading: 'Report Issue',
+                                      subTitle: reportIssue,
                                     ),
                                   ),
                                 );
@@ -184,9 +197,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const UtilsScreen(
+                                    builder: (context) => UtilsScreen(
                                       title: 'SLCB - Legal',
                                       heading: 'Legal Policy',
+                                      subTitle: legalPolicy,
                                     ),
                                   ),
                                 );
@@ -214,9 +228,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const UtilsScreen(
+                                    builder: (context) => UtilsScreen(
                                       title: 'SLCB - Legal',
                                       heading: 'Community Standard',
+                                      subTitle: commiunityStandard,
                                     ),
                                   ),
                                 );
@@ -282,8 +297,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       await _firebaseServices.userSignOutMethod(context);
       Navigator.pushReplacementNamed(context, '/welcomeScreen');
+      //Navigator.pushNamed(context, '/welcomeScreen');
     } catch (e) {
       //AppSnackBar().showSnackBar(context, e.toString());
+      print(e.toString());
     } finally {
       setState(() {
         _isLoading = false;
