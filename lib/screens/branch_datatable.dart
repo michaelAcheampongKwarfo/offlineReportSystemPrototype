@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:offline_report_system/services/data_models.dart';
+import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_snackbar.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
@@ -11,14 +12,15 @@ import 'dart:convert';
 class BranchDataTable extends StatefulWidget {
   final String branchName;
 
-  const BranchDataTable({super.key, required this.branchName});
+  const BranchDataTable({Key? key, required this.branchName}) : super(key: key);
 
   @override
   State<BranchDataTable> createState() => _BranchDataTableState();
 }
 
 class _BranchDataTableState extends State<BranchDataTable> {
-  List<DataTableModel> dataTableModelList = [];
+  List<FileChange> fileChanges = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -27,9 +29,15 @@ class _BranchDataTableState extends State<BranchDataTable> {
   }
 
   Future<void> fetchData() async {
-    List<DataTableModel> data = await getDataTable();
     setState(() {
-      dataTableModelList = data;
+      isLoading = true;
+    });
+
+    List<FileChange> data = await getDataTable();
+
+    setState(() {
+      fileChanges = data;
+      isLoading = false;
     });
   }
 
@@ -58,54 +66,75 @@ class _BranchDataTableState extends State<BranchDataTable> {
             width: screenSize.width,
             color: AppColors.whiteColor,
             padding: EdgeInsets.all(screenSize.width * 0.01),
-            child: Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: AppText(text: 'ID')),
-                    DataColumn(label: AppText(text: 'Name')),
-                    DataColumn(label: AppText(text: 'Size')),
-                    DataColumn(label: AppText(text: 'Created By')),
-                  ],
-                  rows: dataTableModelList.map((data) {
-                    return DataRow(
-                      cells: [
-                        DataCell(AppText(text: data.id)),
-                        DataCell(AppText(text: data.fileName)),
-                        DataCell(AppText(text: data.fileSize)),
-                        DataCell(AppText(text: data.createdBy)),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: AppText(text: 'ID')),
+                        DataColumn(label: AppText(text: 'Name')),
+                        //DataColumn(label: AppText(text: 'Path')),
+                        DataColumn(label: AppText(text: 'Time')),
+                        DataColumn(label: AppText(text: 'Type')),
+                        DataColumn(label: AppText(text: 'Branch')),
+                        //DataColumn(label: AppText(text: 'App')),
                       ],
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+                      // Update the rows section in the DataTable
+                      rows: fileChanges.map((data) {
+                        return DataRow(
+                          cells: [
+                            DataCell(AppText(text: data.id.toString())),
+                            DataCell(GestureDetector(
+                              onTap: () => _showDetailsModal(
+                                  data), // Function to show modal sheet
+                              child: Tooltip(
+                                message: data.filename,
+                                child: AppText(
+                                    text: data.filename.length > 10
+                                        ? '${data.filename.substring(0, 10)}...'
+                                        : data.filename),
+                              ),
+                            )),
+                            //DataCell(AppText(text: data.path)),
+                            DataCell(AppText(text: data.timestamp)),
+                            DataCell(AppText(text: data.type)),
+                            DataCell(AppText(text: data.branch)),
+                            //DataCell(AppText(text: data.app)),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
           ),
         ),
       ),
     );
   }
 
-  Future<List<DataTableModel>> getDataTable() async {
-    String link =
-        'http://192.168.1.36:5000/achBankingTransfer'; // Replace with your actual API endpoint
+  Future<List<FileChange>> getDataTable() async {
+    String link = 'http://192.168.1.36:3001/fileChanges';
+
     try {
       var response = await http.get(Uri.parse(link));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
 
-        List<DataTableModel> modelList = [];
-        for (var eachDataList in jsonData) {
-          final list = DataTableModel(
-            id: eachDataList['fileId'].toString(),
-            fileName: eachDataList['fileName'].toString(),
-            fileSize: eachDataList['size'].toString(),
-            createdBy: eachDataList['createdBy'].toString(),
+        if (jsonData['fileChanges'] is List) {
+          List<FileChange> modelList = [];
+          for (var eachData in jsonData['fileChanges']) {
+            final change = FileChange.fromJson(eachData);
+            modelList.add(change);
+          }
+          return modelList;
+        } else {
+          print('Unexpected data format: ${response.body}');
+          AppSnackBar().showSnackBar(
+            context,
+            'Error: Data is not in the expected format',
           );
-          modelList.add(list);
+          return [];
         }
-        return modelList;
       } else {
         AppSnackBar().showSnackBar(
           context,
@@ -114,12 +143,118 @@ class _BranchDataTableState extends State<BranchDataTable> {
         return [];
       }
     } catch (e) {
+      print('Error fetching data: $e');
       AppSnackBar().showSnackBar(
         context,
         'Error fetching data: $e',
       );
-      //print(e);
       return [];
     }
+  }
+
+  void _showDetailsModal(FileChange data) {
+    showModalBottomSheet(
+      isDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.03,
+              vertical: MediaQuery.of(context).size.height * 0.05),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: AppText(
+                  text: 'Details of the File',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.02,
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "ID: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(
+                    text: data.id.toString(),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "Name: \n",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.0,
+                  ),
+                  Expanded(child: AppText(text: data.filename)),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "Path: \n",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  Expanded(
+                      child: AppText(
+                    text: data.path,
+                  )),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "Time: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(text: data.timestamp),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "Type: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(text: data.type),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "Branch: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(text: data.branch),
+                ],
+              ),
+              Row(
+                children: [
+                  const AppText(
+                    text: "App: ",
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(text: data.app),
+                ],
+              ),
+              const Spacer(),
+              AppButton(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                buttonColor: AppColors.whiteColor,
+                borderColor: AppColors.primaryColor,
+                child: const AppText(text: 'Dismiss'),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }

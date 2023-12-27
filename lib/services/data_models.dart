@@ -1,13 +1,31 @@
-class DataTableModel {
-  String id;
-  String fileName;
-  String fileSize;
-  String createdBy;
+class FileChange {
+  int id;
+  String filename;
+  String path;
+  String timestamp;
+  String type;
+  String branch;
+  String app;
 
-  DataTableModel({
+  FileChange({
     required this.id,
-    required this.fileName,
-    required this.fileSize,
-    required this.createdBy,
+    required this.filename,
+    required this.path,
+    required this.timestamp,
+    required this.type,
+    required this.branch,
+    required this.app,
   });
+
+  factory FileChange.fromJson(Map<String, dynamic> json) {
+    return FileChange(
+      id: json['id'],
+      filename: json['filename'],
+      path: json['path'],
+      timestamp: json['timestamp'],
+      type: json['type'],
+      branch: json['branch'],
+      app: json['app'],
+    );
+  }
 }

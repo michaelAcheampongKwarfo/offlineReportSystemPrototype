@@ -40,6 +40,8 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   google_sign_in:
+  pdf: ^3.10.7
+  path_provider: ^2.0.14
 
 dev_dependencies:
   flutter_test:
