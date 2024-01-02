@@ -14,4 +14,31 @@ class AppSnackBar {
       ),
     );
   }
+
+  // void showBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return Container(
+  //           padding: EdgeInsets.symmetric(
+  //               horizontal: MediaQuery.of(context).size.width * 0.03,
+  //               vertical: MediaQuery.of(context).size.height * 0.05),
+  //           child: SingleChildScrollView(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               mainAxisAlignment: MainAxisAlignment.start,
+  //               children: [
+  //                 // Dropdown for Branch
+  //                 DropdownButtonFormField(items: [items], onChanged: (val){
+  //                   setSta
+  //                 })
+  //                 // Dropdown for fileType
+
+  //                 // Dropdown for display order
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  //}
 }

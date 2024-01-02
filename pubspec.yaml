@@ -41,10 +41,6 @@ dependencies:
   cloud_firestore:
   google_sign_in:
   intl: ^0.17.0
-  #syncfusion_flutter_pdf: ^20.4.44
-  #pdf: ^3.6.0
-  #open_file: ^3.2.1
-  #path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:

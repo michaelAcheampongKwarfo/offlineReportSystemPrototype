@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:offline_report_system/firebase_options.dart';
 import 'package:offline_report_system/screens/contact_us.dart';
 import 'package:offline_report_system/screens/forgot_password.dart';
-import 'package:offline_report_system/screens/home.dart';
 import 'package:offline_report_system/screens/profile.dart';
 import 'package:offline_report_system/screens/signup.dart';
 import 'package:offline_report_system/screens/singin.dart';
+import 'package:offline_report_system/screens/table_screen.dart';
 import 'package:offline_report_system/screens/terms_of_service.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/screens/welcome.dart';
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const HomeScreen();
+              return const TableScreen();
             } else {
               return const WelcomeScreen();
             }
@@ -49,10 +49,10 @@ class MyApp extends StatelessWidget {
         '/signInScreen': (context) => const SignInScreen(),
         '/signUpScreen': (context) => const SignUpScreen(),
         '/forgotPasswordScreen': (context) => const ForgotPasswordScreen(),
-        '/homeScreen': (context) => const HomeScreen(),
         '/profileScreen': (context) => const ProfileScreen(),
         '/termsOfService': (context) => const TermsOfService(),
         '/contactUsScreen': (context) => const ContactUsScreen(),
+        '/tableScreen': (context) => const TableScreen(),
       },
     );
   }

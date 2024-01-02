@@ -251,7 +251,7 @@ class _SignInScreenState extends State<SignInScreen> {
           _passwordController.text.trim(),
         );
         if (_firebaseServices.user.emailVerified) {
-          Navigator.pushReplacementNamed(context, '/homeScreen');
+          Navigator.pushReplacementNamed(context, '/tableScreen');
         } else {
           AppSnackBar().showSnackBar(
             context,
