@@ -2,13 +2,17 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:offline_report_system/services/data_models.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_snackbar.dart';
 import 'package:offline_report_system/widgets/app_text.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class TableScreen extends StatefulWidget {
   const TableScreen({super.key});
@@ -104,9 +108,10 @@ class _TableScreenState extends State<TableScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
+            icon: const Icon(Icons.email_outlined),
             onPressed: () {
               // Generate and display PDF
+              _generatePdf(fileChanges);
             },
           ),
         ],
@@ -177,8 +182,9 @@ class _TableScreenState extends State<TableScreen> {
   }
 
   Future<List<FileChange>> getDataTable() async {
+    //String link = 'http://192.168.32.233:3001/fileChanges';
     String link = 'http://192.168.1.36:3001/fileChanges';
-    //String link = 'http://localhost:3001/fileChanges';
+    // String link = 'http://localhost:3001/fileChanges';
 
     try {
       var response = await http.get(Uri.parse(link));
@@ -337,7 +343,9 @@ class _TableScreenState extends State<TableScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppButton(
-                    onTap: () {},
+                    onTap: () {
+                      _generateSinglePdfDetail(data);
+                    },
                     width: MediaQuery.of(context).size.width * 0.4,
                     buttonColor: AppColors.whiteColor,
                     borderColor: AppColors.primaryColor,
@@ -350,15 +358,18 @@ class _TableScreenState extends State<TableScreen> {
                     ),
                   ),
                   AppButton(
-                    onTap: () {},
+                    onTap: () async {
+                      File pdfFile = await _generatePdf(fileChanges);
+                      _sendPdfByEmail(pdfFile);
+                    },
                     width: MediaQuery.of(context).size.width * 0.4,
                     buttonColor: AppColors.whiteColor,
                     borderColor: AppColors.primaryColor,
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Icon(Icons.share_outlined),
-                        AppText(text: 'Share'),
+                        Icon(Icons.email_outlined),
+                        AppText(text: 'Email'),
                       ],
                     ),
                   ),
@@ -381,7 +392,6 @@ class _TableScreenState extends State<TableScreen> {
           padding: EdgeInsets.only(
             left: MediaQuery.of(context).size.width * 0.03,
             right: MediaQuery.of(context).size.width * 0.03,
-            top: MediaQuery.of(context).size.height * 0.01,
             bottom: MediaQuery.of(context).size.height * 0.05,
           ),
           width: MediaQuery.of(context).size.width,
@@ -394,9 +404,20 @@ class _TableScreenState extends State<TableScreen> {
                 padding: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.02,
                 ),
-                child: const AppText(
-                  text: 'Select Branch',
-                  fontWeight: FontWeight.bold,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const AppText(
+                      text: 'Select Branch',
+                      fontWeight: FontWeight.bold,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.close_outlined),
+                    ),
+                  ],
                 ),
               ),
               DropdownButtonFormField(
@@ -525,5 +546,116 @@ class _TableScreenState extends State<TableScreen> {
     setState(() {
       fileChanges = filteredData;
     });
+  }
+
+  Future<File> _generatePdf(List<FileChange> data) async {
+    final PdfDocument document = PdfDocument();
+    final PdfPage page = document.pages.add();
+    final PdfGrid grid = PdfGrid();
+
+    grid.columns.add(count: 7);
+    final PdfGridRow headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = 'ID';
+    headerRow.cells[1].value = 'Name';
+    headerRow.cells[2].value = 'Path';
+    headerRow.cells[3].value = 'Date';
+    headerRow.cells[4].value = 'Time';
+    headerRow.cells[5].value = 'Path';
+    headerRow.cells[6].value = 'Branch';
+
+    headerRow.style.font =
+        PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+
+    for (var item in data) {
+      PdfGridRow row = grid.rows.add();
+      row.cells[0].value = item.id.toString();
+      row.cells[1].value = item.filename;
+      row.cells[2].value = item.path;
+      row.cells[3].value = item.date;
+      row.cells[4].value = item.time;
+      row.cells[5].value = item.path;
+      row.cells[6].value = item.branch;
+    }
+
+    grid.style.cellPadding = PdfPaddings(left: 5, top: 5);
+    grid.draw(
+        page: page,
+        bounds: Rect.fromLTWH(
+            0, 0, page.getClientSize().width, page.getClientSize().height));
+
+    final directory = await getExternalStorageDirectory();
+    final path = directory?.path;
+    final pdfFile = File('$path/PDFTable.pdf');
+    final bytes = await document.save();
+    await pdfFile.writeAsBytes(bytes);
+
+    _sendPdfByEmail(pdfFile);
+
+    document.dispose();
+
+    OpenFile.open('$path/PDFTable.pdf');
+
+    return pdfFile; // return the pdfFile
+  }
+
+  Future<void> _generateSinglePdfDetail(FileChange data) async {
+    final PdfDocument document = PdfDocument();
+    final PdfPage page = document.pages.add();
+    final PdfGrid grid = PdfGrid();
+
+    grid.columns.add(count: 7);
+    final PdfGridRow headerRow = grid.headers.add(1)[0];
+    headerRow.cells[0].value = 'ID';
+    headerRow.cells[1].value = 'Name';
+    headerRow.cells[2].value = 'Path';
+    headerRow.cells[3].value = 'Date';
+    headerRow.cells[4].value = 'Time';
+    headerRow.cells[5].value = 'Path';
+    headerRow.cells[6].value = 'Branch';
+
+    headerRow.style.font =
+        PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
+
+    PdfGridRow row = grid.rows.add();
+    row.cells[0].value = data.id.toString();
+    row.cells[1].value = data.filename;
+    row.cells[2].value = data.path;
+    row.cells[3].value = data.date;
+    row.cells[4].value = data.time;
+    row.cells[5].value = data.path;
+    row.cells[6].value = data.branch;
+
+    grid.style.cellPadding = PdfPaddings(left: 5, top: 5);
+    grid.draw(
+        page: page,
+        bounds: Rect.fromLTWH(
+            0, 0, page.getClientSize().width, page.getClientSize().height));
+
+    final directory = await getExternalStorageDirectory();
+    final path = directory?.path;
+    final bytes = await document.save();
+    File('$path/PDFTable_${data.id}.pdf').writeAsBytes(bytes);
+
+    document.dispose();
+
+    OpenFile.open('$path/PDFTable_${data.id}.pdf');
+  }
+
+  Future<void> _sendPdfByEmail(File pdfFile) async {
+    try {
+      final directory = await getExternalStorageDirectory();
+      final path = directory!.path;
+      var attachment = File('$path/PDFTable.pdf').path;
+      final Email email = Email(
+        body: 'Offline Report System - PDF File',
+        subject: 'Pdf DataTable',
+        recipients: ['kwarfomichael8@gmail.com'],
+        attachmentPaths: [attachment],
+        isHTML: false,
+      );
+      await FlutterEmailSender.send(email);
+    } catch (e) {
+      AppSnackBar().showSnackBar(context, e.toString());
+    }
   }
 }
