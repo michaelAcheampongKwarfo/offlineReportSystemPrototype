@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.bgColor,
         appBarTheme: const AppBarTheme(
           color: AppColors.primaryColor,
+          centerTitle: true,
         ),
       ),
       home: StreamBuilder(

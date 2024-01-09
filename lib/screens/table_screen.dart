@@ -100,21 +100,50 @@ class _TableScreenState extends State<TableScreen> {
       appBar: AppBar(
         title: const AppText(text: 'Offline Report System'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh screen',
-            onPressed: () {
-              _fetchData(); // Reload data
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.email_outlined),
-            onPressed: () {
-              // Generate and display PDF
-              _generatePdf(fileChanges);
-            },
-          ),
+          Padding(
+            padding: EdgeInsets.only(right: screenSize.width * 0.03),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/profileScreen');
+              },
+              child: const CircleAvatar(
+                child: Icon(Icons.person_outline),
+              ),
+            ),
+          )
         ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.refresh_outlined),
+              title: const AppText(text: 'Refresh Table'),
+              onTap: () {
+                // reload Screen
+                _fetchData();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.email_outlined),
+              title: const AppText(text: 'Send Email'),
+              onTap: () async {
+                // Generate and send PDF
+                File pdfFile = await _generatePdf(fileChanges);
+                _sendPdfByEmail(pdfFile);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.picture_as_pdf_outlined),
+              title: const AppText(text: 'Show PDF'),
+              onTap: () {
+                // Generate and display PDF
+                _generatePdf(fileChanges);
+              },
+            ),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -171,11 +200,20 @@ class _TableScreenState extends State<TableScreen> {
         },
         backgroundColor: AppColors.primaryColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(30.0),
         ),
-        label: const AppText(
-          text: 'Filter',
-          color: AppColors.whiteColor,
+        label: const Row(
+          children: [
+            Icon(
+              Icons.filter_alt_outlined,
+              color: AppColors.whiteColor,
+            ),
+            SizedBox(width: 05.0),
+            AppText(
+              text: 'Filter',
+              color: AppColors.whiteColor,
+            ),
+          ],
         ),
       ),
     );
@@ -589,7 +627,7 @@ class _TableScreenState extends State<TableScreen> {
     final bytes = await document.save();
     await pdfFile.writeAsBytes(bytes);
 
-    _sendPdfByEmail(pdfFile);
+    //_sendPdfByEmail(pdfFile);
 
     document.dispose();
 
@@ -657,5 +695,68 @@ class _TableScreenState extends State<TableScreen> {
     } catch (e) {
       AppSnackBar().showSnackBar(context, e.toString());
     }
+  }
+
+  Future<File> _generatePdfFromDataTable(DataTable dataTable) async {
+    final PdfDocument document = PdfDocument();
+    final PdfPage page = document.pages.add();
+    final PdfGrid grid = PdfGrid();
+
+    // Add columns to the grid
+    grid.columns.add(count: dataTable.columns.length);
+
+    // Add headers to the grid
+    final PdfGridRow headerRow = grid.headers.add(1)[0];
+    for (int i = 0; i < dataTable.columns.length; i++) {
+      headerRow.cells[i].value = dataTable.columns[i].label;
+    }
+
+    // Add rows to the grid
+    for (var row in dataTable.rows) {
+      PdfGridRow pdfRow = grid.rows.add();
+      for (int i = 0; i < row.cells.length; i++) {
+        pdfRow.cells[i].value = row.cells[i].child.runtimeType == Text
+            ? (row.cells[i].child as Text).data
+            : '';
+      }
+    }
+
+    grid.style.cellPadding = PdfPaddings(left: 5, top: 5);
+    grid.draw(
+        page: page,
+        bounds: Rect.fromLTWH(
+            0, 0, page.getClientSize().width, page.getClientSize().height));
+
+    final directory = await getExternalStorageDirectory();
+    final path = directory?.path;
+    final pdfFile = File('$path/PDFTable.pdf');
+    final bytes = await document.save();
+    await pdfFile.writeAsBytes(bytes);
+
+    document.dispose();
+
+    OpenFile.open('$path/PDFTable.pdf');
+
+    return pdfFile; // return the pdfFile
+  }
+
+  void _generateAndDisplayPdfFromFilteredData() async {
+    _applyFilters();
+    await _generatePdfFromDataTable(DataTable(
+      columns: const [
+        DataColumn(label: AppText(text: 'ID')),
+        DataColumn(label: AppText(text: 'Name')),
+        // Add other columns as needed
+      ],
+      rows: fileChanges.map((data) {
+        return DataRow(
+          cells: [
+            DataCell(AppText(text: data.id.toString())),
+            DataCell(AppText(text: data.filename)),
+            // Add other cells as needed
+          ],
+        );
+      }).toList(),
+    ));
   }
 }
