@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             Container(
-              color: AppColors.primaryColor,
+              //color: AppColors.primaryColor,
               child: Container(
                 width: screenSize.width,
                 height: screenSize.height * 0.2,
@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: AppColors.hintColor,
                     ),
                     SizedBox(
-                      height: screenSize.height * 0.02,
+                      height: screenSize.height * 0.01,
                     ),
                     Column(
                       children: [
@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: AppColors.hintColor,
                     ),
                     SizedBox(
-                      height: screenSize.height * 0.02,
+                      height: screenSize.height * 0.01,
                     ),
                     Row(
                       children: [
@@ -186,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: AppColors.hintColor,
                     ),
                     SizedBox(
-                      height: screenSize.height * 0.02,
+                      height: screenSize.height * 0.01,
                     ),
                     Row(
                       children: [
@@ -256,7 +256,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       alignment: Alignment.bottomCenter,
                       child: Column(
                         children: [
-                          const AppText(text: 'APP VERSION 1.0.0'),
+                          const AppText(
+                            text: 'APP VERSION 1.0.0',
+                            fontSize: 13.0,
+                          ),
                           _isLoading
                               ? const CircularProgressIndicator()
                               : AppButton(

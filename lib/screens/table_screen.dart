@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:offline_report_system/services/data_models.dart';
+import 'package:offline_report_system/services/firebase_services.dart';
 import 'package:offline_report_system/widgets/app_button.dart';
 import 'package:offline_report_system/widgets/app_colors.dart';
 import 'package:offline_report_system/widgets/app_snackbar.dart';
@@ -24,6 +26,10 @@ class TableScreen extends StatefulWidget {
 class _TableScreenState extends State<TableScreen> {
   List<FileChange> fileChanges = [];
   bool isLoading = false;
+  final user = FirebaseAuth.instance.currentUser;
+  final FirebaseServices _firebaseServices = FirebaseServices();
+  bool _isLoading = false;
+
   final List<String> _branchList = [
     "All",
     "Head Office",
@@ -99,30 +105,53 @@ class _TableScreenState extends State<TableScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const AppText(text: 'Offline Report System'),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: screenSize.width * 0.03),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/profileScreen');
-              },
-              child: const CircleAvatar(
-                child: Icon(Icons.person_outline),
-              ),
-            ),
-          )
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: EdgeInsets.only(right: screenSize.width * 0.03),
+        //     child: GestureDetector(
+        //       onTap: () {
+        //         Navigator.pushNamed(context, '/profileScreen');
+        //       },
+        //       child: const CircleAvatar(
+        //         child: Icon(Icons.person_outline),
+        //       ),
+        //     ),
+        //   )
+        // ],
       ),
       drawer: Drawer(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+              height: screenSize.height * 0.1,
+            ),
+            const CircleAvatar(
+              radius: 50,
+              child: Icon(
+                Icons.person,
+                size: 50.0,
+                color: AppColors.hintColor,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AppText(
+                text: user?.email ?? 'User Name',
+                textOverflow: TextOverflow.ellipsis,
+                fontSize: 15.0,
+              ),
+            ),
+            SizedBox(
+              height: screenSize.height * 0.1,
+            ),
             ListTile(
               leading: const Icon(Icons.refresh_outlined),
               title: const AppText(text: 'Refresh Table'),
               onTap: () {
                 // reload Screen
                 _fetchData();
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -136,12 +165,39 @@ class _TableScreenState extends State<TableScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.picture_as_pdf_outlined),
-              title: const AppText(text: 'Show PDF'),
+              title: const AppText(text: 'Show In PDF'),
               onTap: () {
                 // Generate and display PDF
                 _generatePdf(fileChanges);
               },
             ),
+            SizedBox(
+              height: screenSize.height * 0.1,
+            ),
+            const AppText(
+              text: 'APP VERSION 1.0.0',
+              fontSize: 13.0,
+            ),
+            _isLoading
+                ? const CircularProgressIndicator()
+                : AppButton(
+                    onTap: () {
+                      userSignOut();
+                    },
+                    width: screenSize.width * 0.5,
+                    borderColor: AppColors.primaryColor,
+                    buttonColor: AppColors.whiteColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const AppText(text: 'LOGOUT'),
+                        SizedBox(
+                          width: screenSize.width * 0.03,
+                        ),
+                        const Icon(Icons.logout_outlined),
+                      ],
+                    ),
+                  ),
           ],
         ),
       ),
@@ -151,21 +207,30 @@ class _TableScreenState extends State<TableScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(screenSize.width * 0.01),
+                padding: EdgeInsets.all(screenSize.width * 0.01 / 5),
                 child: Material(
                   elevation: 3.0,
                   child: Container(
                     width: screenSize.width,
                     color: AppColors.whiteColor,
-                    padding: EdgeInsets.all(screenSize.width * 0.01),
+                    padding: EdgeInsets.all(screenSize.width * 0.05),
                     child: isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
+                              columnSpacing: screenSize.width * 0.1,
                               columns: const [
-                                DataColumn(label: AppText(text: 'ID')),
-                                DataColumn(label: AppText(text: 'Name')),
+                                DataColumn(
+                                    label: AppText(
+                                  text: 'ID',
+                                  fontWeight: FontWeight.bold,
+                                )),
+                                DataColumn(
+                                    label: AppText(
+                                  text: 'Name',
+                                  fontWeight: FontWeight.bold,
+                                )),
                               ],
                               rows: fileChanges.map((data) {
                                 return DataRow(
@@ -177,7 +242,7 @@ class _TableScreenState extends State<TableScreen> {
                                         message: data.filename,
                                         child: AppText(
                                           text: data.filename.length > 20
-                                              ? '${data.filename.substring(0, 30)}...'
+                                              ? '${data.filename.substring(0, 20)}...'
                                               : data.filename,
                                         ),
                                       ),
@@ -221,7 +286,7 @@ class _TableScreenState extends State<TableScreen> {
 
   Future<List<FileChange>> getDataTable() async {
     //String link = 'http://192.168.32.233:3001/fileChanges';
-    String link = 'http://192.168.1.36:3001/fileChanges';
+    String link = 'http://192.168.1.159:3001/fileChanges';
     // String link = 'http://localhost:3001/fileChanges';
 
     try {
@@ -309,6 +374,9 @@ class _TableScreenState extends State<TableScreen> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
               Row(
                 children: [
                   const AppText(
@@ -319,17 +387,20 @@ class _TableScreenState extends State<TableScreen> {
                   Expanded(child: AppText(text: data.filename)),
                 ],
               ),
-              Row(
-                children: [
-                  const AppText(
-                    text: "Path: \n",
-                    fontWeight: FontWeight.bold,
-                  ),
-                  Expanded(
-                      child: AppText(
-                    text: data.path,
-                  )),
-                ],
+              // Row(
+              //   children: [
+              //     const AppText(
+              //       text: "Path: \n",
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //     Expanded(
+              //         child: AppText(
+              //       text: data.path,
+              //     )),
+              //   ],
+              // ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
               ),
               Row(
                 children: [
@@ -340,6 +411,9 @@ class _TableScreenState extends State<TableScreen> {
                   AppText(text: data.date),
                 ],
               ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
               Row(
                 children: [
                   const AppText(
@@ -348,6 +422,9 @@ class _TableScreenState extends State<TableScreen> {
                   ),
                   AppText(text: data.time),
                 ],
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
               ),
               Row(
                 children: [
@@ -358,6 +435,9 @@ class _TableScreenState extends State<TableScreen> {
                   AppText(text: data.type),
                 ],
               ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
               Row(
                 children: [
                   const AppText(
@@ -367,15 +447,15 @@ class _TableScreenState extends State<TableScreen> {
                   AppText(text: data.branch),
                 ],
               ),
-              Row(
-                children: [
-                  const AppText(
-                    text: "App: ",
-                    fontWeight: FontWeight.bold,
-                  ),
-                  AppText(text: data.app),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     const AppText(
+              //       text: "App: ",
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //     AppText(text: data.app),
+              //   ],
+              // ),
               const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -527,7 +607,7 @@ class _TableScreenState extends State<TableScreen> {
                 decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
               const Spacer(),
-              // button for cancel/apply
+              // buttons for cancel and apply
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -687,7 +767,7 @@ class _TableScreenState extends State<TableScreen> {
       final Email email = Email(
         body: 'Offline Report System - PDF File',
         subject: 'Pdf DataTable',
-        recipients: ['kwarfomichael8@gmail.com'],
+        recipients: ['ofosucollins055@gmail.com'],
         attachmentPaths: [attachment],
         isHTML: false,
       );
@@ -758,5 +838,23 @@ class _TableScreenState extends State<TableScreen> {
         );
       }).toList(),
     ));
+  }
+
+  void userSignOut() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      await _firebaseServices.userSignOutMethod(context);
+      Navigator.pushReplacementNamed(context, '/welcomeScreen');
+      //Navigator.pushNamed(context, '/welcomeScreen');
+    } catch (e) {
+      //AppSnackBar().showSnackBar(context, e.toString());
+      print(e.toString());
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

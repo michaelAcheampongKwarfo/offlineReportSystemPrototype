@@ -20,7 +20,7 @@ class UtilsScreen extends StatelessWidget {
         title: AppText(text: title),
       ),
       body: Container(
-        color: AppColors.primaryColor,
+        color: AppColors.whiteColor,
         child: Container(
           decoration: const BoxDecoration(
               color: AppColors.whiteColor,
